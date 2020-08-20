@@ -9,8 +9,8 @@ import torch.utils.data as Data
 
 from vae import VAE
 from sae_repr.mt import train_model
-from sae_dataloader_ml1m import Ml1mRatingDataset
-from sae_dataloader_ml1m import get_ml1m_movie_map
+from dataloader_ml1m import Ml1mRatingDataset
+from dataloader_ml1m import get_ml1m_movie_map
 from sae_train_on_ml1m import L1_none_zero_loss
 
 
@@ -24,7 +24,7 @@ def train_vae_model(vae, data_loader, *, model_name='VAR', model_path='./vae.pt'
     if test_rating is not None:
         test_rating = test_rating.to(dev)
 
-    def sae_callback(model, device, data, loss):
+    def vae_callback(model, device, data, loss):
         x = data.to(device)
         reconst, mu, log_var = model(x)
 
@@ -44,7 +44,7 @@ def train_vae_model(vae, data_loader, *, model_name='VAR', model_path='./vae.pt'
 
         print('epoch %d: test loss %.4f, time %.1f\n' % (epoch + 1, l, time.time() - start))
 
-    train_model(vae, data_loader, sae_callback, model_name=model_name, model_path=model_path,
+    train_model(vae, data_loader, vae_callback, model_name=model_name, model_path=model_path,
                 num_epochs=num_epochs, learning_rate=learning_rate, loss=loss_fn, device=dev,
                 after_epoch=test if test_rating is not None else None, wd=wd)
 
@@ -55,8 +55,8 @@ def main(*, layers, hidden_fn=nn.ReLU(), model_name='VAE', model_path='./vae.pt'
                                    batch_size=batch_size, shuffle=True)
     test_rating = Ml1mRatingDataset('../ml-1m/test_ratings.dat', movie_id2idx)
 
-    sae = VAE(*layers, hidden_fn=hidden_fn)
-    train_vae_model(sae, train_loader, test_rating=test_rating.ratings, model_name=model_name,
+    vae = VAE(*layers, hidden_fn=hidden_fn)
+    train_vae_model(vae, train_loader, test_rating=test_rating.ratings, model_name=model_name,
                     model_path=model_path, wd=wd)
 
 

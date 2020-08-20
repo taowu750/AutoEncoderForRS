@@ -9,8 +9,8 @@ from torch import nn
 import torch.utils.data as Data
 
 from sae_repr.mt import train_model
-from sae_dataloader_ml1m import Ml1mRatingDataset
-from sae_dataloader_ml1m import get_ml1m_movie_map
+from dataloader_ml1m import Ml1mRatingDataset
+from dataloader_ml1m import get_ml1m_movie_map
 from sae_train_on_ml1m import L1_none_zero_loss
 
 num_movies = 3883
